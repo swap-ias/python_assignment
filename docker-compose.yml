@@ -4,15 +4,19 @@ services:
     build:
       context: .
       dockerfile: docker/app/Dockerfile
-    command: bash -c "alembic -c migration/alembic.ini upgrade head && uvicorn app:app --host 0.0.0.0 --port 5000 --reload"
+    platform: "linux/amd64"
+    command: bash -c "uvicorn app:app --host 0.0.0.0 --port 5000 --reload"
     volumes:
-      - ./financial:/app
+      - "./:/app"
+      - /app/venv
+      - /app/docker
+      - /app/.idea
     env_file:
       - .env
     links:
       - mysql
     ports:
-      - "8080:5000"
+      - "5001:5000"
   mysql:
     image: "mysql:8.0"
     platform: "linux/amd64"

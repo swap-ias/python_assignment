@@ -15,3 +15,4 @@ RUN pip install --upgrade pip && \
 
 COPY ./financial/ $APP/financial/
 COPY *.py $APP/
+COPY ./migration/ $APP/migration/
