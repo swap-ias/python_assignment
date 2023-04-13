@@ -1,4 +1,4 @@
-from sqlalchemy import VARCHAR, Column, DATE, FLOAT
+from sqlalchemy import VARCHAR, Column, DATE, DECIMAL
 from sqlalchemy.dialects.mysql import BIGINT
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -11,8 +11,8 @@ class Stocks(Base):
     id = Column("id", BIGINT, primary_key=True, autoincrement=True)
     symbol = Column("symbol", VARCHAR(32), nullable=False, unique=False, index=True)
     date = Column("date", DATE, nullable=False, unique=False, index=False)
-    open_price = Column("open_price", FLOAT, nullable=False, unique=False, index=False)
-    close_price = Column("close_price", FLOAT, nullable=False, unique=False, index=False)
+    open_price = Column("open_price", DECIMAL(19, 2), nullable=False, unique=False, index=False)
+    close_price = Column("close_price", DECIMAL(19, 2), nullable=False, unique=False, index=False)
     volume = Column("volume", BIGINT, nullable=False, unique=False, index=False)
 
     def __repr__(self):

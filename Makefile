@@ -15,3 +15,6 @@ revision: ## Create alembic revision. Usage: make revision m="your message"
 
 enter-db:  ## login to mysql
 	docker-compose exec mysql mysql -h mysql -P 3306 -u root -proot_paas financial_db
+
+enter-server:  ## login to server
+	docker-compose exec app bash

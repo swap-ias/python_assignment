@@ -1,8 +1,8 @@
-"""create table
+"""create financial_data table
 
-Revision ID: 955dc14f97ad
+Revision ID: fb0da21f455b
 Revises: 
-Create Date: 2023-04-13 11:50:57.352025
+Create Date: 2023-04-13 13:18:21.076748
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
-revision = '955dc14f97ad'
+revision = 'fb0da21f455b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,8 +22,8 @@ def upgrade():
     sa.Column('id', mysql.BIGINT(), autoincrement=True, nullable=False),
     sa.Column('symbol', sa.VARCHAR(length=32), nullable=False),
     sa.Column('date', sa.DATE(), nullable=False),
-    sa.Column('open_price', sa.FLOAT(), nullable=False),
-    sa.Column('close_price', sa.FLOAT(), nullable=False),
+    sa.Column('open_price', sa.DECIMAL(precision=19, scale=2), nullable=False),
+    sa.Column('close_price', sa.DECIMAL(precision=19, scale=2), nullable=False),
     sa.Column('volume', mysql.BIGINT(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     mysql_charset='utf8mb4',
