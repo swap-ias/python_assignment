@@ -13,5 +13,5 @@ COPY ./requirements.txt $APP
 RUN pip install --upgrade pip && \
   pip install -r requirements.txt
 
-COPY ./financial/ $APP/
+COPY ./financial/ $APP/financial/
 COPY *.py $APP/
