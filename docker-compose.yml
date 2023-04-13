@@ -1,0 +1,32 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    command: bash -c "uvicorn app:app --host 0.0.0.0 --port 5000 --reload"
+    volumes:
+      - ./financial:/app
+    env_file:
+      - .env
+    links:
+      - mysql
+    ports:
+      - "8080:5000"
+  mysql:
+    image: "mysql:8.0"
+    platform: "linux/amd64"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: "financial_db"
+      MYSQL_USER: "financial_user"
+      MYSQL_PASSWORD: "financial_pass"
+      MYSQL_ROOT_PASSWORD: "root_paas"
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./docker/mysql/sqls:/docker-entrypoint-initdb.d
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/log:/var/log/mysql
+    expose:
+      - "3306"
