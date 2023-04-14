@@ -16,7 +16,7 @@ class DB:
     @staticmethod
     def engine():
         if DB.engine_cache is None:
-            DB.engine_cache = sqlalchemy.create_engine(setting.database_uri, echo=True, echo_pool=True)
+            DB.engine_cache = sqlalchemy.create_engine(setting.database_uri, echo=False, echo_pool=False)
         return DB.engine_cache
 
     @staticmethod
@@ -38,7 +38,6 @@ class Dao:
 
         :param stocks:  List of Stocks object.
         :param batch_size:  The size of batch insert.
-        :return:
         """
         _session = DB.session()
         rows = [stock.to_dict() for stock in stocks]
