@@ -8,9 +8,9 @@ logger = get_logger("get_raw_data")
 stocks = []
 today = date.today()
 for i in range(2001):
-    stock = Stocks(symbol="IBM", date=today+timedelta(days=i), open_price=10.12, close_price=20.12, volume=7892234)
+    stock = Stocks(symbol="IBM", date=today+timedelta(days=i), open_price=i+0.98, close_price=i+0.23, volume=i*100)
     stocks.append(stock)
 
 
-Dao.insert_stocks(stocks)
-
+# Dao.insert_stocks(stocks)
+Dao.upsert_stocks(stocks)

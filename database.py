@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker, session
 from settings import get_settings
 from model import Stocks
 from customized_logger import get_logger
+from sqlalchemy.dialects.mysql import insert as mysql_upsert
 
 setting = get_settings()
 logger = get_logger("database")
@@ -29,21 +30,27 @@ class DB:
 class Dao:
 
     @staticmethod
-    def insert_stocks(stocks: List[Stocks], batch_size: int = 1000):
+    def upsert_stocks(stocks: List[Stocks], batch_size: int = 1000):
         """
-        Insert stock data with batches. Default batch size is 1000.
+        Upsert stock data with batches. Default batch size is 1000.
+        If duplicates is found for (symbol, date) unique key, the (open_price, close_price, volume) will be updated.
         If exception happened during the process, the whole data will be rolled back.
 
         :param stocks:  List of Stocks object.
         :param batch_size:  The size of batch insert.
         :return:
         """
-
         _session = DB.session()
+        rows = [stock.to_dict() for stock in stocks]
         try:
             left, right = 0, batch_size
-            while left < len(stocks):
-                _session.bulk_save_objects(stocks[left:right])
+            while left < len(rows):
+                stmt = mysql_upsert(Stocks).values(rows[left: right])
+                stmt = stmt.on_duplicate_key_update({"open_price": stmt.inserted.open_price,
+                                                     "close_price": stmt.inserted.close_price,
+                                                     "volume": stmt.inserted.volume})
+                _session.execute(stmt)
+
                 left = right
                 right += batch_size
             _session.commit()
