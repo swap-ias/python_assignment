@@ -112,6 +112,14 @@ class Dao:
 
     @staticmethod
     def avg_stock(symbol: str, start_date: date, end_date: date):
+        """
+        Return the average value of stock defined by symbol and time range start_date and end_date.
+
+        :param symbol: The symbol of stock
+        :param start_date: The start date
+        :param end_date: The end date
+        :return:
+        """
         sess = DB.session()
         try:
             query = sess.query(sqlalchemy.func.avg(Stocks.open_price),

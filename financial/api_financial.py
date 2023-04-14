@@ -23,19 +23,18 @@ def financial_data(start_date: Optional[str] = Query(default=None, min_length=10
                    limit: int = Query(default=5, ge=1, le=100),
                    page: int = Query(default=1, ge=1)
                    ):
-    logger.info(
-        f"requested api/financial_data, start_date: {start_date}, end_date: {end_date}, symbol: {symbol}, limit: {limit}, page: {page}.")
-
     try:
+        # convert start_date and end_date from string to date
         if start_date:
             start_date = datetime.strptime(start_date, setting.date_format).date()
         if end_date:
             end_date = datetime.strptime(end_date, setting.date_format).date()
 
         if start_date and end_date and start_date > end_date:
-            return FinancialDataResponse(data=[], page=Pagination(page=page, limit=limit), info=ErrorInfo(
+            return FinancialDataResponse(data=[], page=None, info=ErrorInfo(
                 error=f"start_date={start_date} is bigger than end_date={end_date}."))
 
+        # get total count of results, and a page of result from database
         count, stocks = Dao.query_stocks(symbol, start_date, end_date, limit, page)
 
         return FinancialDataResponse(data=convert_stocks_to_stocks_model(stocks),
@@ -43,13 +42,13 @@ def financial_data(start_date: Optional[str] = Query(default=None, min_length=10
                                                            pages=math.ceil(count / limit)),
                                      info=ErrorInfo())
     except ValueError as e1:
-        return FinancialDataResponse(data=[], page=Pagination(page=page, limit=limit), info=ErrorInfo(
-            error=f"Value error for start_date={start_date} or end_date={end_date}."))
+        return FinancialDataResponse(data=[], page=None, info=ErrorInfo(
+            error=f"Value error. Possibly start_date={start_date} or end_date={end_date} can't be converted to date."))
     except DatabaseValueError as e2:
-        return StatisticDataResponse(data=None, info=ErrorInfo(
+        return FinancialDataResponse(data=[], page=None, info=ErrorInfo(
             error=str(e2)))
     except Exception as e:
-        return FinancialDataResponse(data=[], page=Pagination(page=page, limit=limit), info=ErrorInfo(
+        return FinancialDataResponse(data=[], page=None, info=ErrorInfo(
             error="Error happened while query data."))
 
 
@@ -60,26 +59,28 @@ def statistics(start_date: str = Query(min_length=10, max_length=10,
                                      regex="^[0-9]{4}-[0-9]{2}-[0-9]{2}$"),
                symbol: str = Query(min_length=1, regex="^[a-zA-Z_.]+$")
                ):
-    logger.info(
-        f"requested api/statistics, start_date: {start_date}, end_date: {end_date}, symbol: {symbol}.")
     try:
+        # convert start_date and end_date from string to date
         start_date = datetime.strptime(start_date, setting.date_format).date()
         end_date = datetime.strptime(end_date, setting.date_format).date()
         if start_date > end_date:
             return StatisticDataResponse(data=None, info=ErrorInfo(
                 error=f"start_date={start_date} is bigger than end_date={end_date}."))
 
+        # get avg data from database
         avg_open_price, avg_close_price, avg_volume = Dao.avg_stock(symbol, start_date, end_date)
+
+        # convert data to response model
         data = StatisticStock(symbol=symbol,
-                              start_date={start_date},
-                              end_date={end_date},
+                              start_date=start_date.strftime(setting.date_format),
+                              end_date=end_date.strftime(setting.date_format),
                               average_daily_open_price=avg_open_price,
                               average_daily_close_price=avg_close_price,
                               average_daily_volume=avg_volume)
         return StatisticDataResponse(data=data, info=ErrorInfo())
     except ValueError as e1:
         return StatisticDataResponse(data=None, info=ErrorInfo(
-            error=f"value error for start_date={start_date} or end_date={end_date}."))
+            error=f"Value error. Possibly start_date={start_date} or end_date={end_date} can't be converted to date."))
     except DatabaseValueError as e2:
         return StatisticDataResponse(data=None, info=ErrorInfo(
             error=str(e2)))
