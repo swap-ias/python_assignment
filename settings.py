@@ -20,6 +20,7 @@ def generate_db_uri(protocol, user, password, host, db, port):
 
 class Settings(BaseSettings):
     database_uri: str = generate_db_uri("mysql+pymysql", **DEFAULT_DB)
+    date_format: str = "%Y-%m-%d"
 
 
 @lru_cache()

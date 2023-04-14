@@ -5,3 +5,4 @@ requests==2.25.1
 python-dotenv==1.0.0
 alembic==1.10.2
 pymysql[rsa]==1.0.3
+orjson==3.8.9
