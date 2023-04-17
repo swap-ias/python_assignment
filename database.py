@@ -37,7 +37,7 @@ class Dao:
     def upsert_stocks(stocks: List[Stocks], batch_size: int = 1000):
         """
         Upsert stock data with batches. Default batch size is 1000.
-        If duplicates is found for (symbol, date) unique key, the (open_price, close_price, volume) will be updated.
+        If duplicates is found for unique key (symbol, date), the (open_price, close_price, volume) will be updated with new value.
         If exception happened during the process, the whole data will be rolled back.
 
         :param stocks:  List of Stocks object.
